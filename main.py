@@ -9,23 +9,46 @@ def appStarted(app):
     # https://www.cs.cmu.edu/~112/notes/notes-animations-part4.html#usingModes
     app.mode = "startScreen" #default screen
 
+    if app.mode == "startSreen":
+        app.fourTileButton = False
+        app.sixTileButton = False
+        app.eightTileButton = False
+
     app.gameStarted = False
     app.gameFinished = False
     app.gamePause = False
 
+    app.tileNumPerCol = 10
+    app.highRange = 401 # in increments of 5s, determines how long the games runs for
+
     app.score = 0
     app.level = 1
     app.colTileNum = 4 #tileNum 4, 5, 6, 7
+    if app.colTileNum == 4:
+        app.fourCols = True
+        app.tileNumPerCol = 10
+    else: 
+        app.fourCols = False
+    if app.colTileNum == 6:
+        app.sixCols = True
+        app.tileNumPerCol = 6
+    else: 
+        app.sixCols = False
+    if app.colTileNum == 8:
+        app.eightCols = True
+        app.tileNumPerCol = 4
+    else:
+        app.eightCols = False
+    
     app.timerDelay = 10 #140
 
     app.centerX = app.width//2
     app.centerY = app.height//2
 
-    app.tileNumPerCol = 10
-
     # background grid
     app.tileWidth = app.width//app.colTileNum 
     app.tileBarXPos = [0, app.tileWidth, app.tileWidth*2, app.tileWidth*3, app.tileWidth*4]
+    app.tileBarXPos = generateColBarXPos(app)
 
     #app.tiles = generateTiles(app, app.tileNum) #[tile1, tile2]
     app.board = generateBoard(app)
@@ -40,16 +63,17 @@ def appStarted(app):
 
 
 def startScreen_redrawAll(app, canvas):
-    canvas.create_text(app.width//2, app.height//2, text=f"Press b to begin game")
+    canvas.create_text(app.centerX, app.centerY, text=f"Press b to begin game")
 
 def startScreen_keyPressed(app, event):
     if (event.key == "b"):
         app.mode = "main"
 
-def generateColBarXPos(app, colTileNum):
+def generateColBarXPos(app):
     tileBarXPos = []
-    for i in range(colTileNum):
+    for i in range(app.colTileNum+1):
         tileBarXPos.append(i * app.tileWidth)
+    #print(tileBarXPos)
     return tileBarXPos
 
 def generateBoard(app):
@@ -63,14 +87,50 @@ def generateBoard(app):
 def main_keyPressed(app, event):
     if (event.key == "r"):
         appStarted(app)
+
+    # Keyboard keypresses
     elif (event.key == "d"):
-        columnClicked(app, col=0)
+        if app.fourCols:
+            columnClicked(app, col=0)
+        elif app.sixCols:
+            columnClicked(app, col=1)
+        elif app.eightCols:
+            columnClicked(app, col=2)
     elif (event.key == "f"):
-        columnClicked(app, col=1)
+        if app.fourCols:
+            columnClicked(app, col=1)
+        elif app.sixCols:
+            columnClicked(app, col=2)
+        elif app.eightCols:
+            columnClicked(app, col=3)
     elif (event.key == "j"):
-        columnClicked(app, col=2)
+        if app.fourCols:
+            columnClicked(app, col=2)
+        elif app.sixCols:
+            columnClicked(app, col=3)
+        elif app.eightCols:
+            columnClicked(app, col=4)
     elif (event.key == "k"):
-        columnClicked(app, col=3)
+        if app.fourCols:
+            columnClicked(app, col=3)
+        elif app.sixCols:
+            columnClicked(app, col=4)
+        elif app.eightCols:
+            columnClicked(app, col=5)
+    elif (event.key == "l"):
+        if app.sixCols:
+            columnClicked(app, col=5)
+        elif app.eightCols:
+            columnClicked(app, col=6)
+    elif (event.key == "s"):
+        if app.sixCols:
+            columnClicked(app, col=0)
+        elif app.eightCols:
+            columnClicked(app, col=1)
+    elif (event.key == "a") and (app.eightCols):
+        columnClicked(app, col=0)
+    elif (event.key == ";") and (app.eightCols):
+        columnClicked(app, col=7)
     
     elif (event.key == "b"):
         app.mode = "startScreen"
@@ -99,7 +159,6 @@ def main_timerFired(app):
             moveAllActiveTilesInColumn(column)
             if column.isClicked:
                 tileClicked = column.getClickedTile()
-                #print(tileClicked)
 
                 if tileClicked != None: # case 1: keypressed on tile correctly
                     app.score += 1

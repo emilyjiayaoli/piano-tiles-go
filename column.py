@@ -22,17 +22,11 @@ class Column:
 
         self.colx0, self.colx1 = self.getXColPos()
         # cols
-        self.tileListAllCols = getRandomizedTiles(self.tileNumPerCol)
+        self.tileListAllCols = getRandomizedTiles(tileNum=self.tileNumPerCol, colAmt=app.colTileNum, highRange=app.highRange)
         #self.tileListAllCols = self.getRandomizedTiles(self.tileNum)
 
-        if colNumber == 0:
-            self.tiles = self.getTiles(app, self.tileListAllCols[colNumber], colNumber)
-        elif colNumber == 1:
-            self.tiles = self.getTiles(app, self.tileListAllCols[colNumber], colNumber)
-        elif colNumber == 2:
-            self.tiles = self.getTiles(app, self.tileListAllCols[colNumber], colNumber)
-        elif colNumber == 3:
-            self.tiles = self.getTiles(app, self.tileListAllCols[colNumber], colNumber)
+
+        self.tiles = self.getTiles(app, self.tileListAllCols[colNumber], colNumber)
 
         self.activeTiles = set()
         self.updatedActiveTiles = set()

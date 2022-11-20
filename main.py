@@ -11,6 +11,8 @@ import copy
 # fix generate colbarxpos
 
 def appStarted(app):
+    app.mode = "startScreen"
+    app.gameStarted = False
     app.score = 0
     app.level = 1
     app.colTileNum = 4 #tileNum 4, 5, 6, 7
@@ -32,6 +34,13 @@ def appStarted(app):
     app.height = 1200
     app.barPos = (0, (4*(app.height//5)), app.width, (4*app.height//5)+app.barHeight)
 
+def startScreen_redrawAll(app, canvas):
+    canvas.create_text(app.width//2, app.height//2, text=f"Press b to begin game")
+
+def startScreen_keyPressed(app, event):
+    if (event.key == "b"):
+        app.mode = "main"
+
 def clickButton(app, col):
     column = app.board[col]
     column.isClicked = True
@@ -50,7 +59,7 @@ def generateBoard(app):
         board.append(columnTiles)
     return board
 
-def keyPressed(app, event):
+def main_keyPressed(app, event):
     if (event.key == "r"):
         appStarted(app)
     elif (event.key == "d"):
@@ -61,6 +70,12 @@ def keyPressed(app, event):
         clickButton(app, col=2)
     elif (event.key == "k"):
         clickButton(app, col=3)
+    
+    elif (event.key == "b"):
+        app.mode = "startScreen"
+    elif (event.key == "Space"):
+        app.gameStarted = True
+
 
 def resetTimer(app):
     app.counter = 0
@@ -69,27 +84,30 @@ def resetTimer(app):
 def gameOver():
     pass
 
-def timerFired(app):
+def main_timerFired(app):
     if app.gamePause:
+        app.gameStarted = False
         gameOver()
-    app.counter += 1
-    for column in app.board:
-        activateTilesInCurColumn(column, app.counter)
     
-        if column.isClicked:
-            tileClicked = column.getClickedTile()
-            print(tileClicked)
-            if tileClicked != None:
-                app.score += 1
-                tileClicked.state = "clicked"
-                tileClicked.color = "pink"
-                tileClicked.isActive = False
-            else: #clicked, but no tile is found, stop game
-                app.gamePause = True
+    if app.gameStarted:
+        app.counter += 1
+        for column in app.board:
+            activateTilesInCurColumn(column, app.counter)
+        
+            if column.isClicked:
+                tileClicked = column.getClickedTile()
+                print(tileClicked)
+                if tileClicked != None:
+                    app.score += 1
+                    tileClicked.state = "clicked"
+                    tileClicked.color = "pink"
+                    tileClicked.isActive = False
+                else: #clicked, but no tile is found, stop game
+                    app.gamePause = True
 
-            column.isClicked = False
+                column.isClicked = False
 
-        moveAllActiveTilesInColumn(column)
+            moveAllActiveTilesInColumn(column)
 
 
 def activateTilesInCurColumn(column, counter):
@@ -119,7 +137,7 @@ def drawColumns(app, canvas):
     for column in app.board:
         column.drawColumn(app, canvas)
 
-def redrawAll(app, canvas):
+def main_redrawAll(app, canvas):
     (x0, y0, x1, y1) = app.barPos
     canvas.create_rectangle(x0, y0, x1, y1, fill="yellow")
     drawGrid(app, canvas)

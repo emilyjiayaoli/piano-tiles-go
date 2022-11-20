@@ -1,50 +1,51 @@
 import time
 from tile import *
 from helper import *
+import random
+
+def getRandomizedTiles(tileNum=10, colAmt=4, highRange=401):
+        result = []
+        for col in range(colAmt):
+            # refered https://pynative.com/python-random-randrange/
+            columnResult = sorted(random.sample(range(1, highRange, 10), tileNum))
+            result.append(columnResult)
+        return result
+
 
 class Column:
     def __init__(self, app, colNumber):
         self.app = app
         self.colNumber = colNumber #0, 1, 2, 4
-        self.tileNum = 8 ##arbitrary
+        self.tileNumPerCol = app.tileNumPerCol ##arbitrary
         self.heightOptions = [app.height//8, app.height//5, app.height//2]
         #self.tiles = self.generateColumnTiles()
 
         self.colx0, self.colx1 = self.getXColPos()
+        # cols
+        self.tileListAllCols = getRandomizedTiles(self.tileNumPerCol)
+        #self.tileListAllCols = self.getRandomizedTiles(self.tileNum)
 
         if colNumber == 0:
-            self.tiles = {  10: Tile(self.app, self.colNumber, height=100), 
-                            50: Tile(self.app, self.colNumber, height=100),
-                            102: Tile(self.app, self.colNumber, height=100),
-                            170: Tile(self.app, self.colNumber, height=100),
-                            200: Tile(self.app, self.colNumber, height=100)
-            }
+            self.tiles = self.getTiles(app, self.tileListAllCols[colNumber], colNumber)
         elif colNumber == 1:
-            self.tiles = {  2: Tile(self.app, self.colNumber, height=100), 
-                            44: Tile(self.app, self.colNumber, height=100),
-                            143: Tile(self.app, self.colNumber, height=100),
-                            50: Tile(self.app, self.colNumber, height=100),
-                            250: Tile(self.app, self.colNumber, height=100)
-            }
+            self.tiles = self.getTiles(app, self.tileListAllCols[colNumber], colNumber)
         elif colNumber == 2:
-            self.tiles = {  10: Tile(self.app, self.colNumber, height=100), 
-                            30: Tile(self.app, self.colNumber, height=100),
-                            110: Tile(self.app, self.colNumber, height=100),
-                            180: Tile(self.app, self.colNumber, height=100),
-                            230: Tile(self.app, self.colNumber, height=100)
-            }
+            self.tiles = self.getTiles(app, self.tileListAllCols[colNumber], colNumber)
         elif colNumber == 3:
-            self.tiles = {  20: Tile(self.app, self.colNumber, height=100), 
-                            49: Tile(self.app, self.colNumber, height=100),
-                            15: Tile(self.app, self.colNumber, height=100),
-                            370: Tile(self.app, self.colNumber, height=100),
-                            270: Tile(self.app, self.colNumber, height=100)
-            }
+            self.tiles = self.getTiles(app, self.tileListAllCols[colNumber], colNumber)
 
         self.activeTiles = set()
         self.updatedActiveTiles = set()
 
         self.isClicked = False
+            
+
+    def getTiles(self, app, tileList, colNumber, height=200):
+        tiles = {}
+        for num in tileList:
+            tile = Tile(app, colNumber, height)
+            tiles[num] = tile
+        return tiles
 
     def getRandomHeight(self):
         options = len(self.heightOptions)-1
@@ -87,13 +88,19 @@ class Column:
                     return tile
         return None
 
+    def isActiveTileReachedBottom(self):
+        for tile in self.activeTiles:
+            if tile.hasReachedBottom():
+                print("reached bttom")
+                tile.color = 'red'
+                tile.isActive = False
+                return True
+        return False
+
 def getRandomHeight(L):
         options = len(L)-1
         height = L[random.randint(0, options)]
         return height
-
-
-
 
 # self.tiles = [{  1: Tile(self.app, self.colNumber, height=20), 
 #                         5: Tile(self.app, self.colNumber, height=20),
@@ -112,3 +119,10 @@ def getRandomHeight(L):
 #                         10: Tile(self.app, self.colNumber, height=20),
 #                         17: Tile(self.app, self.colNumber, height=20)
 #         }]
+
+#self.tiles = {  200: Tile(self.app, self.colNumber, height=200), 
+            #                 300: Tile(self.app, self.colNumber, height=200),
+            #                 450: Tile(self.app, self.colNumber, height=200),
+            #                 550: Tile(self.app, self.colNumber, height=200),
+            #                 650: Tile(self.app, self.colNumber, height=200)
+            # }

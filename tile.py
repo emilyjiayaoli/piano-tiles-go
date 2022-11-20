@@ -5,11 +5,11 @@ class Tile:
         self.app = app
         self.column = col #column the tile is in
         if col == 0:
-            self.color = 'blue'
+            self.color = 'black'
         elif col == 1:
-            self.color = 'pink'
+            self.color = 'black'
         else:
-            self.color = 'green'
+            self.color = 'black'
 
 
         self.x1 = app.tileBarXPos[col]

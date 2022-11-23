@@ -18,6 +18,9 @@ def appStarted(app):
     app.gameFinished = False
     app.gamePause = False
 
+    app.centerX = app.width//2
+    app.centerY = app.height//2
+
     app.tileNumPerCol = 10
     app.highRange = 401 # in increments of 5s, determines how long the games runs for
 
@@ -42,9 +45,6 @@ def appStarted(app):
     
     app.timerDelay = 10 #140
 
-    app.centerX = app.width//2
-    app.centerY = app.height//2
-
     # background grid
     app.tileWidth = app.width//app.colTileNum 
     app.tileBarXPos = [0, app.tileWidth, app.tileWidth*2, app.tileWidth*3, app.tileWidth*4]
@@ -61,9 +61,47 @@ def appStarted(app):
     app.height = 1200
     app.barPos = (0, (4*(app.height//5))-20, app.width, (4*app.height//5)+app.barHeight)
 
+    app.fourTilesButton = getButtonPosition(app.centerX-100, app.centerY)
+    app.sixTilesButton = getButtonPosition(app.centerX, app.centerY)
+    app.eightTilesButton = getButtonPosition(app.centerX+100, app.centerY)
+
 
 def startScreen_redrawAll(app, canvas):
-    canvas.create_text(app.centerX, app.centerY, text=f"Press b to begin game")
+    bHeight = 20
+    # canvas.create_rectangle(app.centerX-2*bHeight, app.centerY-bHeight, 
+    #                         app.centerX+2*bHeight, app.centerY+bHeight,fill="pink")
+    canvas.create_text(app.centerX, app.centerY-40, text=f"Press b to begin game")
+    canvas.create_text(app.centerX, app.centerY-60, text=f"Press r to restart game")
+    
+    # draws button
+    drawButton(canvas, app.fourTilesButton,  "4 Tiles")
+    drawButton(canvas, app.sixTilesButton, "6 Tiles")
+    drawButton(canvas, app.eightTilesButton, "8 Tiles")
+
+def drawButton(canvas, targetRectTuple, text, color="pink"):
+    (x0, y0, x1, y1) = targetRectTuple
+    canvas.create_rectangle(x0, y0, x1, y1, fill=color)
+    canvas.create_text(x0+(abs(x1-x0)//2), y0+(abs(y1-y0)//2), text=text)
+
+def getButtonPosition(centerX, centerY, width=40, height=20):
+    return (centerX-width, centerY-height, centerX+width, centerY+height)
+
+def isButtonClicked(event, targetRectTuple):
+    (x0, y0, x1, y1) = targetRectTuple
+    if x0 < event.x < x1 and y0 < event.y < y1:
+        return True
+    return False
+
+def startScreen_mousePressed(app, event):
+    if isButtonClicked(event, app.fourTilesButton):
+        app.mode = "main"
+        app.colTileNum = 4
+    elif isButtonClicked(event, app.sixTilesButton):
+        app.mode = "main"
+        app.colTileNum = 6
+    elif isButtonClicked(event, app.eightTilesButton):
+        app.mode = "main"
+        app.colTileNum = 8
 
 def startScreen_keyPressed(app, event):
     if (event.key == "b"):
@@ -147,6 +185,9 @@ def resetTimer(app):
 
 def gameOver():
     pass
+
+# def startScreen_timerFired(app):
+
 
 def main_timerFired(app):
     if app.gamePause:

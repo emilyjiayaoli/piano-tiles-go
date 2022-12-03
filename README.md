@@ -1,3 +1,3 @@
 # piano-tiles-go 
 
-Pianotile game with variable levels
+Pianotile game with variable levels. Run main.py.
